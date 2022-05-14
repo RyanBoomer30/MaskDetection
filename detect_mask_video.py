@@ -11,6 +11,16 @@ import os
 import pyttsx3
 import threading
 import queue
+import serial
+
+arduino = serial.Serial('COM3', 9600)
+time.sleep(2)
+print("Connection to arduino...")
+
+def serial_commute(x_coord):
+	data = "X{0:f}".format(x_coord)
+	arduino.write(data.encode('utf-8'))
+	# print("Coordinate is :", data)
 
 # To play audio text-to-speech during execution
 class TTSThread(threading.Thread):
@@ -119,17 +129,17 @@ status = []
 # loop over the frames from the video stream
 while True:
 	# speak function
-	print(len(status))
+	# print(len(status))
 	while len(status) >= 20:
 		status.pop(0)
 		if status.count(0) >= 5:
-			print("No Mask")
-			q.put("Put on your mask you dumbass")
+			# print("No Mask")
+			q.put("Put on your mask")
 
 	# grab the frame from the threaded video stream and resize it
 	# to have a maximum width of 400 pixels
 	frame = vs.read()
-	frame = imutils.resize(frame, width=1000)
+	frame = imutils.resize(frame, width=400)
 
 	# detect faces in the frame and determine if they are wearing a
 	# face mask or not
@@ -146,6 +156,11 @@ while True:
 		# the bounding box and text
 		label = "Mask" if mask > withoutMask else "No Mask"
 		color = (0, 255, 0) if label == "Mask" else (0, 0, 255)
+
+		centerX = int(startX + endX) / 2
+
+		if label =="No Mask":
+			serial_commute(centerX)
 
 		# update label
 		if label == "Mask":
