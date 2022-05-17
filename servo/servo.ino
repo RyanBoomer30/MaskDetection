@@ -29,9 +29,9 @@ void loop() {
         is outside it
     */
     if (x_mid > width / 2 + 30)
-      xpos += angle;
-    if (x_mid < width / 2 - 30)
       xpos -= angle;
+    if (x_mid < width / 2 - 30)
+      xpos += angle;
 
 
     // if the servo degree is outside its range
